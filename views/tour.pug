@@ -1,0 +1,106 @@
+extends base
+include _reviewCard
+
+//- when we extend the block, the content inside that disappears
+//- theres another way of extending block: which will simply add the new content at the beginning or at the end of the block
+block append head
+  //- we are using this link for mapbox instead of it's npm library bcoz the library has some issues with parcel
+  script(src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js')
+  link(href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet')
+  //- script(src='/js/mapbox.js')
+  //- script(src='https://js.stripe.com/v3/')
+
+//- mixins are basically reusable pieces of code that we can pass arguments into, so bit like a function 
+mixin overviewBox(label, text, icon)
+  .overview-box__detail
+    svg.overview-box__icon
+      use(xlink:href=`/img/icons.svg#icon-${icon}`)
+    span.overview-box__label= label
+    span.overview-box__text= text
+      
+block content
+  //- h1 This is the tour detail page
+
+  section.section-header
+    .header__hero
+      .header__hero-overlay &nbsp;
+      img.header__hero-img(src=`/img/tours/${tour.imageCover}`, alt=`${tour.name}`)
+
+    .heading-box
+      h1.heading-primary
+        span= `${tour.name} tour`
+      .heading-box__group
+        .heading-box__detail
+          svg.heading-box__icon
+            use(xlink:href='/img/icons.svg#icon-clock')
+          span.heading-box__text= `${tour.duration} days`
+        .heading-box__detail
+          svg.heading-box__icon
+            use(xlink:href='/img/icons.svg#icon-map-pin')
+          span.heading-box__text= tour.startLocation.description
+
+  section.section-description
+    .overview-box
+      div
+        .overview-box__group
+          h2.heading-secondary.ma-bt-lg Quick facts
+
+          - const date = tour.startDates[0].toLocaleString('en-in', {month:'long', year:'numeric'})
+          +overviewBox('Next date', date, 'calendar')
+          +overviewBox('Difficulty', tour.difficulty, 'trending-up')
+          +overviewBox('Participants', `${tour.maxGroupSize} people`, 'user')
+          +overviewBox('Rating', `${tour.ratingsAverage} / 5`, 'star')
+
+        .overview-box__group
+          h2.heading-secondary.ma-bt-lg Your tour guides
+
+          each guide in tour.guides
+            .overview-box__detail
+              img.overview-box__img(src=`/img/users/${guide.photo}`, alt= `${guide.name}`)
+
+              - if(guide.role === 'lead-guide')
+                span.overview-box__label Lead guide
+              - if(guide.role === 'guide')
+                span.overview-box__label Tour guide
+              //- span.overview-box__label= guide.role
+              span.overview-box__text= guide.name
+
+    .description-box
+      h2.heading-secondary.ma-bt-lg= `About ${tour.name} tour`
+      -const paragraphs = tour.description.split('\n')
+      each p in paragraphs
+        p.description__text= p
+
+  section.section-pictures
+    //- in pug loop, we can define a second variable which is going to be the index
+    each img, i in tour.images
+      .picture-box
+        img.picture-box__img(src=`/img/tours/${img}`, alt=`The Park Camper Tour ${i + 1}`, class=`picture-box__img--${i + 1}`)
+
+  section.section-map
+    #map(data-locations=`${JSON.stringify(tour.locations)}`)
+
+  section.section-reviews
+    .reviews
+      each review in tour.reviews 
+        +reviewCard(review)
+
+
+
+  section.section-cta
+    .cta
+      .cta__img.cta__img--logo
+        img(src='/img/logo-white.png', alt='Natours logo')
+      img.cta__img.cta__img--1(src= `/img/tours/${tour.images[1]}`, alt='Tour picture')
+      img.cta__img.cta__img--2(src= `/img/tours/${tour.images[2]}`, alt='Tour picture')
+      .cta__content
+        h2.heading-secondary What are you waiting for?
+        p.cta__text= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
+        
+        if user
+          //- we should also put the current tourId right in this element bcoz the api endpoint that we created(checkout-session)
+          //- needs a tourId and that tourId needs to come from somewhere so we'll put it on this element so that then our js file
+          //- can grab it from here and send it along with the request to checkout session route
+          button.btn.btn--green.span-all-rows#book-tour(data-tour-id=`${tour.id}`) Book tour now!
+        else
+          a.btn.btn--green.span-all-rows(href='/login') Log in to book tour.
