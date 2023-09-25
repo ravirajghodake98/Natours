@@ -57,7 +57,7 @@ app.post('/webhook-checkout', express.raw({ type: 'application/json' }), booking
 
 //BODY parser
 app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({extended:true,limit:'10kb'}));    
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 
 //Data sanitization against NoSQL query injection
