@@ -1,11 +1,9 @@
 extends base
 
 block content
-  //- h1 This is the tour overview
   main.main
     .card-container
 
-      //- pug comes with built-in loop, and this tours is the variable which we created in viewController
       each tour in tours
         .card
           .card__header
