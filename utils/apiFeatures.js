@@ -1,8 +1,5 @@
-//i will create a class in which i'm going to add method for each of the API features or functionalities
 class APIFeatures {
-  //this constructor function will get automatically called as soon as we create a new object out of this class
-  //again i'm querying here, bcoz i do not want to query inside of this class bcoz that would then bounce this class to tour resource
-  constructor(query, queryString) {   //we are passing the mongoose query and the queryString that we are getting from the express
+  constructor(query, queryString) {
     this.query = query;
     this.queryString = queryString;
   }
@@ -14,16 +11,13 @@ class APIFeatures {
 
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\bgte|gt|lte|lt\b/g, match => `$${match}`);
-
     this.query = this.query.find(JSON.parse(queryStr));
 
-    //this is simply the entire object
     return this;
   }
 
   sort() {
     if (this.queryString.sort) {
-      // console.log(this.queryString.sort);
       const sortBy = this.queryString.sort.split(',').join(' ');
       this.query = this.query.sort(sortBy);
     } else {
