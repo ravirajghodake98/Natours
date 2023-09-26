@@ -7,22 +7,30 @@ const router = express.Router();
 
 router.use('/:tourId/reviews', reviewRouter)
 
-router.route('/top-5-cheap').get(tourController.aliasTopTours, tourController.getAllTours);
+router
+  .route('/top-5-cheap')
+  .get(tourController.aliasTopTours, tourController.getAllTours);
 
-router.route('/tour-stats').get(tourController.getTourStats)
+router.route('/tour-stats')
+  .get(tourController.getTourStats)
+
 router.route('/monthly-plan/:year')
-  .get(authController.protect, authController.restrictTo('admin', 'lead-guide', 'guide'), tourController.getMonthlyPlan);
+  .get(authController.protect,
+    authController.restrictTo('admin', 'lead-guide', 'guide'),
+    tourController.getMonthlyPlan);
 
-router.route('/tours-within/:distance/center/:latlng/unit/:unit').get(tourController.getToursWithin);
+router
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(tourController.getToursWithin);
 
-router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
+router
+  .route('/distances/:latlng/unit/:unit')
+  .get(tourController.getDistances);
 
 router
   .route('/')
-  //we might want to allow other travel sites to embed our tours into their own websites, therefore we'll not have any authorization on get all tours
   .get(tourController.getAllTours)
-  //the actions of creating or editing tours should be done by lead guides and admins only
-  .post(authController.protect, authController.restrictTo('admin','lead-guide'), tourController.createTour)
+  .post(authController.protect, authController.restrictTo('admin', 'lead-guide'), tourController.createTour)
 
 router
   .route('/:id')
